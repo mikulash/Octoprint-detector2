@@ -28,31 +28,29 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
     # user settings
     def on_after_startup(self):
         self._logger.info("DETECTOR 2 STARTED!")
-        user = {
-            "host": self._settings.get(["host"]),
-            "username": self._settings.get(["username"]),
-            "password": self._settings.get(["password"]),
-            "port": self._settings.get(["port"]),
-            "to": self._settings.get(["to"]),
-            "confidence": self._settings.get(["confidence"])
-        }
-        self._plugin_manager.send_plugin_message(self._identifier, dict(type="userChange", data=user))
 
     def get_settings_defaults(self):
         return {
             "host": "smtp.office365.com",
             "username": "your new outlook mail",
-            "password": "password",
+            "password": base64.b64encode("default password".encode("utf-8")),
             "port": 587,
             "to": "your personal mail",
             "confidence": 75
         }
 
     def on_settings_save(self, data):
-        self._logger.info("settings saved sent{}".format(data))
         self._plugin_manager.send_plugin_message(self._identifier, dict(type="userChange", data=data))
+        if ("password" in data):
+            data["password"] = base64.b64encode(data.get("password").encode("utf-8"))
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
+    def on_settings_load(self):
+        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+        data["password"] = base64.b64decode(data.get("password"))
+        self._plugin_manager.send_plugin_message(self._identifier, dict(type="userChange", data=data))
+        octoprint.plugin.SettingsPlugin.on_settings_load(self)
+        return data
 
     def get_template_configs(self):
         return [
@@ -66,15 +64,6 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
         currTime = datetime.datetime.now().strftime("%H:%M:%S")
         self._snapshot_url = self._settings.global_get(['webcam', "snapshot"])
         response = get(self._snapshot_url, verify=False, timeout=5)
-        user = {
-            "host": self._settings.get(["host"]),
-            "username": self._settings.get(["username"]),
-            "password": self._settings.get(["password"]),
-            "port": self._settings.get(["port"]),
-            "to": self._settings.get(["to"]),
-            "confidence": self._settings.get(["confidence"])
-        }
-        self._plugin_manager.send_plugin_message(self._identifier, dict(type="userChange", data=user))
         if success:
             self._img_path = filename
             with open(filename, 'rb') as f:

@@ -83,6 +83,9 @@ $(function () {
                         self.user[key] = message.data[key];
                     });
                 }
+                else if (message.type === "test") {
+                    console.log(message.data)
+                }
             }
         };
 
