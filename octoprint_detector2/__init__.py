@@ -28,7 +28,6 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
     # user settings
     def on_after_startup(self):
         self._logger.info("DETECTOR 2 STARTED____________________________!")
-        self._logger.info("Hello World! (more: %s)" % self._settings.get(["url"]))
         user = {
             "host": self._settings.get(["host"]),
             "username": self._settings.get(["username"]),

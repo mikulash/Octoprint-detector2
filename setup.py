@@ -27,7 +27,7 @@ plugin_author = "Mikulas Heinz"
 plugin_author_email = "heinz.mikulas@gmail.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/mikulash/OctoPrint-Detector2"
+plugin_url = "https://github.com/mikulash/OctoPrint-detector2"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"
@@ -59,7 +59,7 @@ plugin_ignored_packages = []
 # Example:
 #     plugin_requires = ["someDependency==dev"]
 #     additional_setup_parameters = {"dependency_links": ["https://github.com/someUser/someRepo/archive/master.zip#egg=someDependency-dev"]}
-# "python_requires": ">=3,<4" blocks installation on Python 2 systems, to prevent confused users and provide a helpful error. 
+# "python_requires": ">=3,<4" blocks installation on Python 2 systems, to prevent confused users and provide a helpful error.
 # Remove it if you would like to support Python 2 as well as 3 (not recommended).
 additional_setup_parameters = {"python_requires": ">=3,<4"}
 
