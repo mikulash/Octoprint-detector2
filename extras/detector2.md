@@ -122,4 +122,5 @@ Email sending stopped working.
 To prevent spamming, Outlook has a daily limit for services like this. Open the Outlook account and you should have received a prompt to verify this account. After verification you should be able to start receiving email again.
 
 ## problems or feedback?
-If you are having any trouble or have an idea to implement, let me know! This plugin is part of my bachelor thesis so any feedback would be much appreciated.
+If you are having any trouble or have an idea to implement, let me know! This plugin is part of my bachelor thesis so any feedback would be much appreciated. Reach me at discussion in this plugin github repository
+https://github.com/mikulash/Octoprint-detector2/discussions
