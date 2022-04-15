@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_detector2/templates *
+recursive-include octoprint_detector2/translations *
+recursive-include octoprint_detector2/static *
