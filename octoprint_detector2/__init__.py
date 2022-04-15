@@ -27,7 +27,7 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
 
     # user settings
     def on_after_startup(self):
-        self._logger.info("DETECTOR 2 STARTED____________________________!")
+        self._logger.info("DETECTOR 2 STARTED!")
         user = {
             "host": self._settings.get(["host"]),
             "username": self._settings.get(["username"]),
@@ -81,7 +81,7 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
                 snap_two = f.read()
                 snap_two = base64.encodebytes(snap_two)
             self._plugin_manager.send_plugin_message(self._identifier, dict(type="snap", time=currTime, img=snap_two))
-            self._logger.info("update sent")
+            # self._logger.info("update sent")
 
     def get_assets(self):
         return {

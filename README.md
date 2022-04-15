@@ -17,10 +17,15 @@ Uses Tensorflow.js for prediction, https://www.smtpjs.com/ to send mail via java
 ## Configuration
 
 1. To enable email sending it needs to use an SMTP connection. Free and easy to set up is via Outlook. For now, this plugin uses exclusively Outlook so at this moment there is no need for extra set-up. Just creating an email will do it.
+<img width="500" src="assets/img/outlookPreview.png">
 2. In the settings of this plugin enter the username and password for created Outlook account.
+<img width="500" src="assets/img/settingsPreview.png">
 3. This plugin uses snapshots sent by the Timelapse plugin, which is preinstalled with Octoprint. Go to the Timelapse tab and choose snapshot interval. The minimal recommended interval is 10 seconds to let the plugin have enough time to detect errors from an image.
+After print timelapse is created and it's deletion is not implemented. I suggest for now delete these timelapse manually or use other plugin to delete them automatically.
 4. Once you start printing you should see the last sent image and result that this detector gets as well with confidence of the result.
-5. If the confidence of the error is greater than 75 %. It starts the alarm and sends you an email. Email is sent exactly once to prevent spamming.
+<img width="500" src="assets/img/OctoprintPreview.png">
+5. If the confidence of the error is greater than 75 %, it starts the alarm and emails you the detected error. Email is sent exactly once to prevent spamming. You can change the confidence threshold in settings.
+<img src="assets/img/mailPreview.png">
 6. That’s it. You just need to leave the octoprint tab running in the browser and let it work.
 
 ## Q&A
