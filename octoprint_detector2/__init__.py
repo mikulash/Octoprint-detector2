@@ -63,7 +63,6 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
         # self._logger.info("Post handler success: {}, filename: {}".format(success, filename))
         currTime = datetime.datetime.now().strftime("%H:%M:%S")
         self._snapshot_url = self._settings.global_get(['webcam', "snapshot"])
-        response = get(self._snapshot_url, verify=False, timeout=5)
         if success:
             self._img_path = filename
             with open(filename, 'rb') as f:
