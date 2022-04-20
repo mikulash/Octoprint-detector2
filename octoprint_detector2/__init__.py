@@ -3,10 +3,6 @@ from __future__ import absolute_import
 
 import base64
 import datetime
-from PIL import Image
-import glob
-from requests import get
-import smtplib
 
 import octoprint.plugin
 import octoprint.events
