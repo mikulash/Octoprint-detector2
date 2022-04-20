@@ -6,10 +6,10 @@ It is completely free without any monthly subscriptions or one time fees unlike 
 Tensorflow.js for prediction, https://www.smtpjs.com/ to send mail via javascript and Outlook to serve as an SMTP server.
 
 ## setup
-Install via the [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html) or manually using this URL:
+Install via the [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html) or manually using latest release here:
 
-    https://github.com/mikulash/Octoprint-detector2/archive/master.zip
-
+    https://github.com/mikulash/Octoprint-detector2/releases
+    
 ## Configuration
 
 1. To enable email sending it needs to use an SMTP connection. Free and easy to set up is via Outlook. For now, this plugin uses exclusively Outlook so at this moment there is no need for extra set-up. Just creating an email will do it.
