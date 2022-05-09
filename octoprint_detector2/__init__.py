@@ -1,4 +1,6 @@
 # coding=utf-8
+# Author: Mikulas Heinz, xheinz01, 2022, License: AGPLv3
+
 from __future__ import absolute_import
 
 import base64

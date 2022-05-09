@@ -30,7 +30,9 @@ $(function () {
         self.alarmCounter = 0;
 
         self.onStartup = function () {
+            //runs on loading octoprint page in browser
             console.log("DETECTOR STARTUP");
+            //placeholder for user information settings
             self.user = {
                 host: "smtp.office365.com",
                 username: "your new outlook mail",
@@ -39,7 +41,7 @@ $(function () {
                 to: "your personal mail",
                 confidence: 75
             };
-
+            //create HTML elements to show results of prediction
             self.state_text = document.createElement("span");
             self.state_text.id = "plugin-detector-state";
             self.last_image = new Image();
@@ -72,6 +74,7 @@ $(function () {
             //     self.detectWithCV()
             // }
             if (plugin === "detector2") {
+                //message is intended for this plugin
                 if (message.type === "snap") {
                     // console.log("new image from basic timelapse...");
                     let img_src = "data:image/png;base64," + message.img;
@@ -80,6 +83,7 @@ $(function () {
                         "Snapshot taken at: " + message.time + " <br> ";
                     self.last_image.src = img_src;
                     self.last_image.onload = function () {
+                        // run prediction once the image is loaded
                         (async () => await self.modelPredict(self.last_image))();
                     };
                 } else if (message.type === "userChange") {
@@ -88,12 +92,14 @@ $(function () {
                     });
                 }
                 else if (message.type === "test") {
+                    //testing purposes
                     console.log(message.data)
                 }
             }
         };
 
         self.modelPredict = async function (theImg) {
+            // function for image recognition using Tensorflow JS
             let starttime = undefined
             if(self.dev){
                 starttime = Date.now()
@@ -105,8 +111,8 @@ $(function () {
             const resized = tf.cast(smalImg, "float32");
             const t4d = tf.tensor4d(Array.from(resized.dataSync()), [1, 300, 300, 3]);
 
-            let prediction = self.model.execute(t4d);
-            let dataS = prediction.softmax().dataSync();
+            let prediction = self.model.execute(t4d); //run TF model on image
+            let dataS = prediction.softmax().dataSync(); //get prediction certainty
 
             if (self.dev) {
                 let duration = Date.now() - starttime
@@ -129,6 +135,7 @@ $(function () {
             let confidence = max * 100;
             confidence = confidence.toFixed(2);
             if (index > 0) {
+                // if result is not OK
                 self.state_text.innerHTML =
                     self.state_text.innerHTML +
                     "Detecting " +
@@ -137,6 +144,7 @@ $(function () {
                     confidence +
                     " %<br>";
                 if (confidence >= parseInt(self.user.confidence)) {
+                    // if confidence of error is above thresh set by user, send info and sound the alarm
                     if (self.alarmCounter < 3) {
                         alarm(
                             self.emailSent,
@@ -150,6 +158,7 @@ $(function () {
                     }
                 }
             } else {
+                // AI detected OK
                 self.state_text.innerHTML =
                     self.state_text.innerHTML +
                     "Looking good. I'm " +
@@ -159,7 +168,7 @@ $(function () {
         };
 
         self.detectWithCV = function () {
-            // to be released in future version
+            // NOT USED, maybe to be released in future version
             if (self.objectHueColor === undefined) return;
             let src = cv.imread(self.canvas);
             let dst = new cv.Mat();
@@ -175,7 +184,7 @@ $(function () {
             cv.cvtColor(src, src, cv.COLOR_BGR2HLS_FULL, 0);
             // cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY , 0);
             cv.bilateralFilter(src, blur, 5, 75, 75); // snizit d=velikost filtru, pokud nebude stihat
-            // cv.inRange(blur, low, high, dst); TODO maska pomoci barvy
+            // cv.inRange(blur, low, high, dst);
             outputCanvas = document.querySelector("#canvasOutput");
             if (self.prevImage === undefined) {
                 self.prevImage = blur;
@@ -188,6 +197,8 @@ $(function () {
 
         self.getCursorPosition = function (canvas, event) {
             // https://stackoverflow.com/a/18053642
+            //not used, would have been used for changes detection
+            //gets color and position on canvas mouse click
             const rect = canvas.getBoundingClientRect();
             console.log(canvas);
             const x = event.clientX - rect.left;
@@ -200,6 +211,7 @@ $(function () {
     }
 
     OCTOPRINT_VIEWMODELS.push({
+        //generated by Octoprint
         construct: Detector2ViewModel,
         // ViewModels your plugin depends on, e.g. loginStateViewModel, settingsViewModel, ...
         dependencies: [
@@ -213,12 +225,14 @@ $(function () {
 });
 
 function alarm(emailSent, lastImage, errorType, confidence, user) {
+    // alarm file is from https://www.youtube.com/watch?v=iNpXCzaWW1s
     let audio = new Audio("./plugin/detector2/static/alarm.mp3");
     audio.play();
     let date = new Date().toLocaleString();
     let bodyMessage =
         "Time: " + date + ". Detected error with " + confidence + "% confidence.<br/>";
     if (!emailSent) {
+        //send SMTP email
         Email.send({
             Host: user.host,
             Username: user.username,
@@ -228,12 +242,14 @@ function alarm(emailSent, lastImage, errorType, confidence, user) {
             Subject: confidence + "% chance of " + errorType,
             Body: bodyMessage,
             Attachments: [
+                //file as an attachment because of gmail
                 {
                     name: "errorSnapshot.png",
                     data: lastImage
                 }
             ]
         }).then((message) => {
+            // inform about email sending success/failure
             console.log("email sending", message);
             alert("Mail: " + message);
         });
