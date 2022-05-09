@@ -14,7 +14,8 @@ $(function () {
         self.last_image = undefined;
         //ML
         // self.modelURL = "./plugin/detector2/static/js/graphMobileNetModel/model.json";
-        self.modelURL = "./plugin/detector2/static/js/graphEffNetB3Model/model.json";
+        // self.modelURL = "./plugin/detector2/static/js/graphEffNetB3Model/model.json";
+        self.modelURL = "./plugin/detector2/static/js/graphEffNetB3Model2/model.json";
         // self.modelInputShape = [300, 300]; // mobilenet
         self.modelInputShape = [300, 300];  //Effnet B3 a MobileNet
         self.modelLabels = ["OK", "Spaghetti", "Stringing or blobs"];
@@ -76,7 +77,7 @@ $(function () {
             if (plugin === "detector2") {
                 //message is intended for this plugin
                 if (message.type === "snap") {
-                    // console.log("new image from basic timelapse...");
+                    console.log("new image from basic timelapse...");
                     let img_src = "data:image/png;base64," + message.img;
                     self.imgNotEncoded = message.img;
                     self.state_text.innerHTML =
