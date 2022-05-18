@@ -78,10 +78,10 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
         custom_payload = dict(errorType=data['errorType'], confidence=data['confidence'])
         self._event_bus.fire(event, payload=custom_payload)
 
-    def on_event(self, event, payload):
-        # testing event emiting
-        if event == Events.PLUGIN_DETECTOR2_ERROR_FOUND:
-            self._logger.info("on event {}".format(payload))
+    # def on_event(self, event, payload):
+    #     # testing event emiting
+    #     if event == Events.PLUGIN_DETECTOR2_ERROR_FOUND:
+    #         self._logger.info("on event {}".format(payload))
 
     def on_api_get(self, request):
         self.send_error_found_event(request.args)
