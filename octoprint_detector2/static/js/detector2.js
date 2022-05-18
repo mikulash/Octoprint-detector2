@@ -26,6 +26,7 @@ $(function () {
         self.prevImage = undefined;
         //notify user
         self.emailSent = false;
+        self.sendEmail = true;
         self.imgNotEncoded = undefined;
         self.user = undefined;
         self.alarmCounter = 0;
@@ -77,7 +78,7 @@ $(function () {
             if (plugin === "detector2") {
                 //message is intended for this plugin
                 if (message.type === "snap") {
-                    console.log("new image from basic timelapse...");
+                    // console.log("new image from basic timelapse...");
                     let img_src = "data:image/png;base64," + message.img;
                     self.imgNotEncoded = message.img;
                     self.state_text.innerHTML =
@@ -91,6 +92,9 @@ $(function () {
                     Object.keys(message.data).forEach(function (key) {
                         self.user[key] = message.data[key];
                     });
+                    if (self.user.to === ""){
+                        self.sendEmail = false
+                    }
                 }
                 else if (message.type === "test") {
                     //testing purposes
@@ -98,6 +102,24 @@ $(function () {
                 }
             }
         };
+
+        self.sendInfoToBackend = function (errorType, confidence){
+            let url = API_BASEURL + 'plugin/detector2'
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                data:   { errorType: errorType, confidence: confidence} ,
+                contentType: "application/json; charset=UTF-8",
+                success: function(response) {
+                    console.log("info about error sent to backend successfully")
+                },
+                error: function() {
+                    console.log("sending info about error failed")
+                }
+
+            })
+        }
 
         self.modelPredict = async function (theImg) {
             // function for image recognition using Tensorflow JS
@@ -146,15 +168,19 @@ $(function () {
                     " %<br>";
                 if (confidence >= parseInt(self.user.confidence)) {
                     // if confidence of error is above thresh set by user, send info and sound the alarm
+                    if (self.alarmCounter < 1){
+                        self.sendInfoToBackend(self.modelLabels[index], confidence)
+                    }
                     if (self.alarmCounter < 3) {
                         alarm(
-                            self.emailSent,
+                            self.sendEmail,
                             self.imgNotEncoded,
                             self.modelLabels[index],
                             confidence,
                             self.user
                         );
                         self.emailSent = true;
+                        self.sendEmail = false;
                         self.alarmCounter++;
                     }
                 }
@@ -225,14 +251,14 @@ $(function () {
     });
 });
 
-function alarm(emailSent, lastImage, errorType, confidence, user) {
+function alarm(sendEmail, lastImage, errorType, confidence, user) {
     // alarm file is from https://www.youtube.com/watch?v=iNpXCzaWW1s
     let audio = new Audio("./plugin/detector2/static/alarm.mp3");
     audio.play();
     let date = new Date().toLocaleString();
     let bodyMessage =
         "Time: " + date + ". Detected error with " + confidence + "% confidence.<br/>";
-    if (!emailSent) {
+    if (sendEmail) {
         //send SMTP email
         Email.send({
             Host: user.host,
