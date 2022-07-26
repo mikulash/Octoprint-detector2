@@ -5,6 +5,11 @@ from __future__ import absolute_import
 
 import base64
 import datetime
+import smtplib, ssl
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import octoprint.plugin
 import octoprint.events
@@ -25,10 +30,11 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
 
     def __init__(self):
         self._img_path = None
+        self.data = None
 
     # user settings
     def on_after_startup(self):
-        self._logger.info("DETECTOR 2 STARTED!")
+        self._logger.info("|||||||||||||||DETECTOR 2 STARTED!||||||||||||||||\||")
 
     def get_settings_defaults(self):
         return {
@@ -51,6 +57,7 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
         data["password"] = base64.b64decode(data.get("password"))
         self._plugin_manager.send_plugin_message(self._identifier, dict(type="userChange", data=data))
         octoprint.plugin.SettingsPlugin.on_settings_load(self)
+        self.data = data
         return data
 
     def get_template_configs(self):
@@ -61,7 +68,6 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
 
     # snapshot taken hook
     def capture_post_handler(self, filename, success):
-        # self._logger.info("Post handler success: {}, filename: {}".format(success, filename))
         currTime = datetime.datetime.now().strftime("%H:%M:%S")
         if success:
             self._img_path = filename
@@ -85,6 +91,7 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
 
     def on_api_get(self, request):
         self.send_error_found_event(request.args)
+        self.sendEmail(request.args)
         return flask.jsonify(foo="bar")
 
     def get_assets(self):
@@ -106,6 +113,40 @@ class Detector2Plugin(octoprint.plugin.SettingsPlugin,
                 "pip": "https://github.com/mikulash/OctoPrint-Detector2/archive/{target_version}.zip",
             }
         }
+
+    def sendEmail(self, content):
+        data = self.data
+        password = data['password'].decode('utf-8')
+        smtp_server = data['host']
+        sender_email = data['username']
+        receiver_email = data['to']
+        message = "Error type: {} with confidence of {} %.".format(content['errorType'], content['confidence'])
+        with open(self._img_path, 'rb') as f:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(f.read())
+        encoders.encode_base64(part)
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename=error.jpg",
+        )
+        self._logger.info(message)
+        part1 = MIMEText(message, "plain")
+        message = MIMEMultipart()
+        message["Subject"] = "Error was found during printing"
+        message["From"] = data['username']
+        message["To"] = data['to']
+        message.attach(part1)
+        message.attach(part)
+        context = ssl.create_default_context()
+        try:
+            server = smtplib.SMTP(smtp_server, data['port'])
+            server.starttls(context=context)  # Secure the connection
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+            server.close()
+        except Exception as e:
+            self._logger.info(" mail exception {}".format(e))
+
 
 __plugin_name__ = "Detector2 Plugin"
 __plugin_pythoncompat__ = ">=3,<4"  # Only Python 3

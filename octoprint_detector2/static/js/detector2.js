@@ -34,6 +34,7 @@ $(function () {
         self.onStartup = function () {
             //runs on loading octoprint page in browser
             console.log("DETECTOR STARTUP");
+            console.log("DETECTOR 222222");
             //placeholder for user information settings
             self.user = {
                 host: "smtp.office365.com",
@@ -172,13 +173,7 @@ $(function () {
                         self.sendInfoToBackend(self.modelLabels[index], confidence)
                     }
                     if (self.alarmCounter < 3) {
-                        alarm(
-                            self.sendEmail,
-                            self.imgNotEncoded,
-                            self.modelLabels[index],
-                            confidence,
-                            self.user
-                        );
+                        alarm();
                         self.emailSent = true;
                         self.sendEmail = false;
                         self.alarmCounter++;
@@ -251,34 +246,8 @@ $(function () {
     });
 });
 
-function alarm(sendEmail, lastImage, errorType, confidence, user) {
+function alarm() {
     // alarm file is from https://www.youtube.com/watch?v=iNpXCzaWW1s
     let audio = new Audio("./plugin/detector2/static/alarm.mp3");
     audio.play();
-    let date = new Date().toLocaleString();
-    let bodyMessage =
-        "Time: " + date + ". Detected error with " + confidence + "% confidence.<br/>";
-    if (sendEmail) {
-        //send SMTP email
-        Email.send({
-            Host: user.host,
-            Username: user.username,
-            Password: user.password,
-            To: user.to,
-            From: user.username,
-            Subject: confidence + "% chance of " + errorType,
-            Body: bodyMessage,
-            Attachments: [
-                //file as an attachment because of gmail
-                {
-                    name: "errorSnapshot.png",
-                    data: lastImage
-                }
-            ]
-        }).then((message) => {
-            // inform about email sending success/failure
-            console.log("email sending", message);
-            alert("Mail: " + message);
-        });
-    }
 }
